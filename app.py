@@ -753,15 +753,26 @@ elif profit < 0:
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=x, y=y, mode='lines', line=dict(color=COLORS['terracotta'], width=3, shape='spline'),
             fill='tozeroy', fillcolor='rgba(201,123,99,0.12)'))
-        fig.add_hline(y=0, line_dash="dot", line_color=COLORS['muted'], opacity=0.5)
+        fig.add_hline(y=0, line_dash="dot", line_color='#1A3C40', line_width=2)
         fig.update_layout(
-            title=dict(text=f"Cash Runway: {runway:.1f} months", font=dict(size=13, color=COLORS['text'])),
-            xaxis=dict(title="Months", showgrid=False, zeroline=False),
-            yaxis=dict(title="Cash ($)", showgrid=False, zeroline=False),
-            height=380, template="plotly_white", margin=dict(l=20, r=20, t=50, b=40),
-            plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)'
+            title=dict(text=f"💸 Cash Runway: {runway:.1f} months", font=dict(size=16, color='#1A3C40', family='Arial Black')),
+            xaxis=dict(
+                title=dict(text="Months", font=dict(size=14, color='#1A3C40', family='Arial')),
+                showgrid=True, gridcolor='rgba(0,0,0,0.08)', zeroline=False,
+                tickfont=dict(size=13, color='#1A3C40', family='Arial'),
+                fixedrange=True
+            ),
+            yaxis=dict(
+                title=dict(text="Cash ($)", font=dict(size=14, color='#1A3C40', family='Arial')),
+                showgrid=True, gridcolor='rgba(0,0,0,0.08)', zeroline=False,
+                tickfont=dict(size=13, color='#1A3C40', family='Arial'),
+                fixedrange=True
+            ),
+            height=380, template="plotly_white", margin=dict(l=20, r=20, t=60, b=50),
+            plot_bgcolor='rgba(255,255,255,0.95)', paper_bgcolor='rgba(0,0,0,0)',
+            dragmode=False
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
     
     st.markdown(alert("error", "🔥 BURNING CASH", f"Losing ${burn:,.0f}/month. {runway:.1f} months until zero cash."), unsafe_allow_html=True)
 else:
@@ -979,23 +990,27 @@ if price > unit:
         annotation_position="top left",
         annotation_font=dict(size=12, color='#D4A855', family='Arial'))
     
-    # Target label - higher and to the left of line
-    fig_be.add_vline(x=cups, line_dash="solid", line_color='#1E90FF', line_width=3,
-        annotation_text=f"🎯 Target: {cups}/day", 
-        annotation_position="top right",
-        annotation_font=dict(size=12, color='#1E90FF', family='Arial'),
-        annotation_yshift=50)
-    
     fig_be.update_layout(
-        title=dict(text="📈 Revenue vs Cost by Daily Sales Volume", font=dict(size=14, color=COLORS['primary'])),
-        xaxis=dict(title="Cups/Day", showgrid=True, gridcolor='rgba(0,0,0,0.05)', zeroline=False),
-        yaxis=dict(title="$/Month", showgrid=True, gridcolor='rgba(0,0,0,0.05)', zeroline=False),
+        title=dict(text="📈 Revenue vs Cost by Daily Sales Volume", font=dict(size=16, color=COLORS['primary'], family='Arial Black')),
+        xaxis=dict(
+            title=dict(text="Cups/Day", font=dict(size=14, color='#1A3C40', family='Arial')),
+            showgrid=True, gridcolor='rgba(0,0,0,0.08)', zeroline=False,
+            tickfont=dict(size=13, color='#1A3C40', family='Arial'),
+            fixedrange=True  # Disable zoom on x-axis
+        ),
+        yaxis=dict(
+            title=dict(text="$/Month", font=dict(size=14, color='#1A3C40', family='Arial')),
+            showgrid=True, gridcolor='rgba(0,0,0,0.08)', zeroline=False,
+            tickfont=dict(size=13, color='#1A3C40', family='Arial'),
+            fixedrange=True  # Disable zoom on y-axis
+        ),
         height=420, template="plotly_white", 
-        legend=dict(orientation="h", y=1.1, font=dict(size=11)),
-        margin=dict(l=20, r=20, t=60, b=40), 
-        plot_bgcolor='rgba(255,255,255,0.9)', paper_bgcolor='rgba(0,0,0,0)'
+        legend=dict(orientation="h", y=1.12, font=dict(size=13, color='#1A3C40', family='Arial')),
+        margin=dict(l=20, r=20, t=70, b=50), 
+        plot_bgcolor='rgba(255,255,255,0.95)', paper_bgcolor='rgba(0,0,0,0)',
+        dragmode=False  # Completely disable drag/zoom
     )
-    st.plotly_chart(fig_be, use_container_width=True)
+    st.plotly_chart(fig_be, use_container_width=True, config={'displayModeBar': False, 'staticPlot': False})
 else:
     st.warning("⚠️ Price is below unit cost - cannot calculate break-even point. Raise your price!")
 
