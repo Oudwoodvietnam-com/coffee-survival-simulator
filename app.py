@@ -9,8 +9,6 @@ import plotly.graph_objects as go
 import numpy as np
 from fpdf import FPDF
 import base64
-import tempfile
-import os
 
 # ============================================================================
 # COLOR PALETTE
@@ -272,26 +270,26 @@ st.markdown(f"""
     .metric-delta.negative {{ color: {COLORS['error']}; }}
     
     .ai-insight {{
-        font-size: 0.75rem;
-        padding: 0.35rem 0.6rem;
-        border-radius: 6px;
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
         margin-top: 0.5rem;
         display: inline-block;
-        font-weight: 500;
+        font-weight: 600;
     }}
     
-    .ai-insight.excellent {{ background: rgba(45,106,79,0.1); color: {COLORS['success']}; }}
-    .ai-insight.good {{ background: rgba(74,155,155,0.1); color: {COLORS['teal']}; }}
-    .ai-insight.warning {{ background: rgba(212,168,85,0.15); color: #B8942F; }}
-    .ai-insight.danger {{ background: rgba(201,123,99,0.1); color: {COLORS['error']}; }}
+    .ai-insight.excellent {{ background: rgba(45,106,79,0.15); color: #1B5E3F; border: 1px solid #2D6A4F; }}
+    .ai-insight.good {{ background: rgba(74,155,155,0.15); color: #2B7A78; border: 1px solid #4A9B9B; }}
+    .ai-insight.warning {{ background: rgba(212,168,85,0.2); color: #8B6914; border: 1px solid #D4A855; }}
+    .ai-insight.danger {{ background: rgba(201,123,99,0.15); color: #A84832; border: 1px solid #C97B63; }}
     
     .section-header {{
         color: {COLORS['primary']};
-        font-size: 1rem;
-        font-weight: 600;
+        font-size: 1.1rem;
+        font-weight: 700;
         margin: 1.75rem 0 1rem 0;
         padding-bottom: 0.5rem;
-        border-bottom: 2px solid {COLORS['accent']};
+        border-bottom: 3px solid {COLORS['accent']};
         display: inline-block;
     }}
     
@@ -302,22 +300,22 @@ st.markdown(f"""
     }}
     
     .alert-success {{
-        background: linear-gradient(135deg, rgba(45,106,79,0.08) 0%, rgba(45,106,79,0.03) 100%);
-        border-left: 4px solid {COLORS['success']};
+        background: linear-gradient(135deg, rgba(45,106,79,0.12) 0%, rgba(45,106,79,0.05) 100%);
+        border-left: 5px solid {COLORS['success']};
     }}
     
     .alert-warning {{
-        background: linear-gradient(135deg, rgba(212,168,85,0.1) 0%, rgba(212,168,85,0.03) 100%);
-        border-left: 4px solid {COLORS['warning']};
+        background: linear-gradient(135deg, rgba(212,168,85,0.15) 0%, rgba(212,168,85,0.05) 100%);
+        border-left: 5px solid {COLORS['warning']};
     }}
     
     .alert-error {{
-        background: linear-gradient(135deg, rgba(201,123,99,0.08) 0%, rgba(201,123,99,0.03) 100%);
-        border-left: 4px solid {COLORS['error']};
+        background: linear-gradient(135deg, rgba(201,123,99,0.12) 0%, rgba(201,123,99,0.05) 100%);
+        border-left: 5px solid {COLORS['error']};
     }}
     
-    .alert-title {{ font-weight: 600; font-size: 0.95rem; margin-bottom: 0.3rem; }}
-    .alert-text {{ font-size: 0.85rem; color: {COLORS['muted']}; }}
+    .alert-title {{ font-weight: 700; font-size: 1rem; margin-bottom: 0.4rem; color: {COLORS['primary']}; }}
+    .alert-text {{ font-size: 0.9rem; color: {COLORS['text']}; line-height: 1.5; }}
     
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
@@ -327,6 +325,9 @@ st.markdown(f"""
         .header-container {{ flex-direction: column; text-align: center; }}
         .metric-value {{ font-size: 1.5rem; }}
         .block-container {{ padding: 1rem 0.5rem !important; }}
+        .ai-insight {{ font-size: 0.8rem; padding: 0.4rem 0.6rem; }}
+        .alert-title {{ font-size: 0.95rem; }}
+        .alert-text {{ font-size: 0.85rem; }}
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -473,24 +474,79 @@ def create_pdf(data):
     pdf.key_metric("Rent Ratio:", f"{data['rent_r']:.1f}% of Revenue", rent_status)
     pdf.key_metric("Labor Ratio:", f"{data['labor_r']:.1f}% of Revenue", labor_status)
     pdf.key_metric("COGS Ratio:", f"{data['cogs_r']:.1f}% of Revenue", cogs_status)
-    pdf.ln(5)
+    pdf.ln(8)
     
-    # ==================== CHARTS ====================
-    if 'chart_images' in data and data['chart_images']:
-        pdf.add_page()
-        pdf.section_title("FINANCIAL VISUALIZATIONS")
-        pdf.ln(3)
+    # ==================== BREAK-EVEN ANALYSIS ====================
+    pdf.section_title("BREAK-EVEN ANALYSIS")
+    
+    # Calculate break-even
+    if data['avg_price'] > data['unit_cost']:
+        fixed_costs = data['monthly_labor'] + data['monthly_rent'] + data['utilities']
+        be_cups_monthly = fixed_costs / (data['avg_price'] - data['unit_cost'])
+        be_cups_daily = be_cups_monthly / data['operating_days']
+        cups_surplus = data['cups_per_day'] - be_cups_daily
         
-        for chart_name, chart_path in data['chart_images'].items():
-            if os.path.exists(chart_path):
-                pdf.set_font('Helvetica', 'B', 11)
-                pdf.set_text_color(26, 60, 64)
-                pdf.cell(0, 8, chart_name, ln=True)
-                pdf.image(chart_path, x=15, w=180)
-                pdf.ln(8)
+        pdf.key_metric("Fixed Costs/Month:", f"${fixed_costs:,.0f}")
+        pdf.key_metric("Contribution Margin/Cup:", f"${data['avg_price'] - data['unit_cost']:.2f}")
+        pdf.key_metric("Break-even Point:", f"{be_cups_daily:.0f} cups/day ({be_cups_monthly:,.0f}/month)")
+        pdf.key_metric("Your Projection:", f"{data['cups_per_day']} cups/day", 
+                       f"+{cups_surplus:.0f} above BE" if cups_surplus > 0 else f"{cups_surplus:.0f} below BE!")
+        
+        if data['profit'] > 0:
+            payback_mo = (data['renovation'] + data['equipment']) / data['profit']
+            pdf.key_metric("Payback Period:", f"{payback_mo:.1f} months ({payback_mo/12:.1f} years)")
+    else:
+        pdf.key_metric("Status:", "INVALID - Price below unit cost!", "[CRITICAL]")
+    pdf.ln(8)
+    
+    # ==================== FINANCIAL SUMMARY TABLE ====================
+    pdf.section_title("MONTHLY PROFIT & LOSS STATEMENT")
+    
+    pdf.set_font('Helvetica', '', 10)
+    pdf.set_text_color(26, 60, 64)
+    
+    # Revenue
+    pdf.cell(100, 6, "  REVENUE", ln=False)
+    pdf.cell(0, 6, f"${data['revenue']:,.0f}", ln=True, align='R')
+    
+    # Expenses
+    pdf.set_text_color(80, 80, 80)
+    pdf.cell(100, 6, "    (-) Cost of Goods Sold", ln=False)
+    pdf.cell(0, 6, f"${data['monthly_cogs']:,.0f}", ln=True, align='R')
+    
+    pdf.cell(100, 6, "    (-) Labor", ln=False)
+    pdf.cell(0, 6, f"${data['monthly_labor']:,.0f}", ln=True, align='R')
+    
+    pdf.cell(100, 6, "    (-) Rent", ln=False)
+    pdf.cell(0, 6, f"${data['monthly_rent']:,.0f}", ln=True, align='R')
+    
+    pdf.cell(100, 6, "    (-) Utilities", ln=False)
+    pdf.cell(0, 6, f"${data['utilities']:,.0f}", ln=True, align='R')
+    
+    # Total Expenses
+    pdf.set_font('Helvetica', 'B', 10)
+    pdf.set_text_color(26, 60, 64)
+    pdf.cell(100, 6, "  TOTAL EXPENSES", ln=False)
+    pdf.cell(0, 6, f"${data['expenses']:,.0f}", ln=True, align='R')
+    
+    # Profit line
+    pdf.ln(2)
+    pdf.set_draw_color(26, 60, 64)
+    pdf.line(10, pdf.get_y(), 200, pdf.get_y())
+    pdf.ln(2)
+    
+    profit_color = (45, 106, 79) if data['profit'] >= 0 else (201, 123, 99)
+    pdf.set_text_color(*profit_color)
+    pdf.set_font('Helvetica', 'B', 12)
+    pdf.cell(100, 8, "  NET PROFIT/LOSS", ln=False)
+    pdf.cell(0, 8, f"${data['profit']:,.0f}", ln=True, align='R')
+    
+    pdf.set_font('Helvetica', 'I', 10)
+    pdf.cell(100, 6, "  Net Margin", ln=False)
+    pdf.cell(0, 6, f"{data['margin']:.1f}%", ln=True, align='R')
     
     # ==================== FOOTER NOTE ====================
-    pdf.ln(10)
+    pdf.ln(15)
     pdf.set_font('Helvetica', 'I', 9)
     pdf.set_text_color(128, 128, 128)
     pdf.cell(0, 5, 'This report was generated by Coffee Shop Survival Simulator 2026.', ln=True)
@@ -614,80 +670,8 @@ else:
 payback = (reno + equip) / profit if profit > 0 else float('inf')
 
 # ============================================================================
-# EXPORT PDF BUTTON
+# EXPORT PDF BUTTON (Simplified - No Charts)
 # ============================================================================
-
-# Function to create charts for PDF
-def create_donut_chart_for_pdf():
-    labels = ['COGS', 'Labor', 'Base Rent', 'NNN', 'Utilities']
-    values = [cogs, labor, rent_b, rent_n, util]
-    # Brighter, more vibrant colors for commercial quality
-    colors_chart = ['#00A86B', '#E63946', '#1E90FF', '#9B59B6', '#F39C12']
-    
-    fig = go.Figure(data=[go.Pie(
-        labels=labels, values=values, hole=0.6,
-        marker=dict(colors=colors_chart, line=dict(color='white', width=3)),
-        textinfo='percent+label', textposition='outside',
-        textfont=dict(size=13, family='Arial Black'),
-        pull=[0.02, 0.02, 0.02, 0.02, 0.02]  # Slight pull for 3D effect
-    )])
-    fig.add_annotation(
-        text=f"<b>${exp:,.0f}</b><br><span style='font-size:12px'>Total/Month</span>",
-        x=0.5, y=0.5, font=dict(size=22, color='#1A3C40', family='Arial Black'), showarrow=False
-    )
-    fig.update_layout(
-        title=dict(text=f"📊 Monthly Cost Structure (Total: ${exp:,.0f})", 
-                  font=dict(size=16, color='#1A3C40', family='Arial Black')),
-        height=480, width=700, showlegend=False,
-        margin=dict(l=50, r=50, t=70, b=50),
-        paper_bgcolor='white'
-    )
-    return fig
-
-def create_breakeven_chart_for_pdf():
-    if price > unit:
-        fixed = labor + rent_t + util
-        be = fixed / (price - unit)
-        be_d = be / days
-        
-        x_vals = np.linspace(0, cups * 1.5, 50)
-        rev_line = x_vals * price * days
-        cost_line = (x_vals * unit * days) + fixed
-        
-        # Brighter, more vibrant colors for commercial quality
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=x_vals, y=rev_line, name='Revenue', 
-            line=dict(color='#00A86B', width=4),  # Bright emerald green
-            fill='tozeroy', fillcolor='rgba(0, 168, 107, 0.1)'))
-        fig.add_trace(go.Scatter(x=x_vals, y=cost_line, name='Total Cost', 
-            line=dict(color='#E63946', width=4)))  # Vibrant red
-        
-        # Break-even line at top
-        fig.add_vline(x=be_d, line_dash="dash", line_color='#D4A855', line_width=2,
-            annotation_text=f"☕ Break-even: {be_d:.0f}/day",
-            annotation_position="top left",
-            annotation_font=dict(size=12, color='#D4A855', family='Arial Black'))
-        
-        # Target line - positioned higher and to the left
-        fig.add_vline(x=cups, line_dash="solid", line_color='#1E90FF', line_width=3,
-            annotation_text=f"🎯 Target: {cups}/day",
-            annotation_position="top right",
-            annotation_font=dict(size=12, color='#1E90FF', family='Arial Black'),
-            annotation_yshift=40)  # Shift up
-        
-        fig.update_layout(
-            title=dict(text=f"📈 Break-even Analysis ({cups} cups/day @ ${price:.2f})", 
-                      font=dict(size=16, color='#1A3C40', family='Arial Black')),
-            xaxis_title="Cups per Day", yaxis_title="$ per Month",
-            xaxis=dict(gridcolor='rgba(0,0,0,0.1)', title_font=dict(size=12)),
-            yaxis=dict(gridcolor='rgba(0,0,0,0.1)', title_font=dict(size=12)),
-            height=420, width=700,
-            legend=dict(orientation="h", y=1.12, font=dict(size=11)),
-            margin=dict(l=60, r=50, t=90, b=60),
-            plot_bgcolor='white'
-        )
-        return fig
-    return None
 
 pdf_data = {
     # Executive Summary
@@ -718,51 +702,11 @@ pdf_data = {
 col_exp1, col_exp2 = st.columns([3, 1])
 with col_exp2:
     if st.button("📥 Export PDF", type="primary", use_container_width=True):
-        with st.spinner("Generating charts..."):
-            # Create temp directory for charts
-            temp_dir = tempfile.mkdtemp()
-            chart_images = {}
-            
-            try:
-                # Generate Donut Chart
-                donut_fig = create_donut_chart_for_pdf()
-                donut_path = os.path.join(temp_dir, "donut_chart.png")
-                donut_fig.write_image(donut_path, scale=2)
-                chart_images["Cost Structure Breakdown"] = donut_path
-                
-                # Generate Break-even Chart
-                be_fig = create_breakeven_chart_for_pdf()
-                if be_fig:
-                    be_path = os.path.join(temp_dir, "breakeven_chart.png")
-                    be_fig.write_image(be_path, scale=2)
-                    chart_images["Break-even Analysis"] = be_path
-                
-                # Add chart images to pdf_data
-                pdf_data['chart_images'] = chart_images
-                
-                # Generate PDF
-                pdf_bytes = create_pdf(pdf_data)
-                b64 = base64.b64encode(pdf_bytes).decode()
-                href = f'<a href="data:application/pdf;base64,{b64}" download="Business_Plan_2026.pdf">📄 Click to Download PDF</a>'
-                st.markdown(href, unsafe_allow_html=True)
-                st.success("✅ Report with charts generated!")
-                
-            except Exception as e:
-                st.error(f"Chart generation failed: {str(e)}")
-                # Fallback: generate PDF without charts
-                pdf_data['chart_images'] = {}
-                pdf_bytes = create_pdf(pdf_data)
-                b64 = base64.b64encode(pdf_bytes).decode()
-                href = f'<a href="data:application/pdf;base64,{b64}" download="Business_Plan_2026.pdf">📄 Download PDF (no charts)</a>'
-                st.markdown(href, unsafe_allow_html=True)
-            
-            finally:
-                # Cleanup temp files
-                for path in chart_images.values():
-                    if os.path.exists(path):
-                        os.remove(path)
-                if os.path.exists(temp_dir):
-                    os.rmdir(temp_dir)
+        pdf_bytes = create_pdf(pdf_data)
+        b64 = base64.b64encode(pdf_bytes).decode()
+        href = f'<a href="data:application/pdf;base64,{b64}" download="Coffee_Shop_Business_Plan_2026.pdf">📄 Click to Download PDF</a>'
+        st.markdown(href, unsafe_allow_html=True)
+        st.success("✅ Business Plan PDF generated successfully!")
 
 # ============================================================================
 # HELPERS
