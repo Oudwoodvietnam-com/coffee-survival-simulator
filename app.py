@@ -189,6 +189,18 @@ st.markdown(f"""
         margin-bottom: 0.5rem !important;
     }}
     
+    /* Enhanced visibility for nested expanders */
+    section[data-testid="stSidebar"] .stExpander .stExpander {{
+        background: #E8F4F4 !important;
+        border: 2px solid {COLORS['primary']} !important;
+    }}
+    
+    section[data-testid="stSidebar"] .stExpander .stExpander summary p {{
+        color: {COLORS['primary']} !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+    }}
+    
     /* Nested expander styling */
     .breakdown-expander {{
         background: rgba(26, 60, 64, 0.03);
