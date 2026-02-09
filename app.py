@@ -623,19 +623,20 @@ st.markdown("""
     /* Floating indicator near sidebar toggle */
     .sidebar-hint {
         position: fixed;
-        top: 12px;
-        left: 55px;
+        top: 10px;
+        left: 48px;
         z-index: 999999;
         background: linear-gradient(135deg, #1A3C40 0%, #2D5A5A 100%);
         color: white;
-        padding: 10px 18px;
-        border-radius: 25px;
-        font-size: 0.9rem;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.75rem;
         font-weight: 600;
-        box-shadow: 0 4px 15px rgba(26, 60, 64, 0.4);
+        box-shadow: 0 2px 10px rgba(26, 60, 64, 0.3);
         animation: bounceHint 1.5s ease-in-out infinite;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         white-space: nowrap;
+        pointer-events: none;
     }
     
     @keyframes bounceHint {
@@ -644,29 +645,23 @@ st.markdown("""
             opacity: 1;
         }
         50% { 
-            transform: translateX(8px);
-            opacity: 0.8;
+            transform: translateX(5px);
+            opacity: 0.7;
         }
-    }
-    
-    /* Hide when sidebar is open */
-    [data-testid="stSidebar"][aria-expanded="true"] ~ .main .sidebar-hint,
-    .sidebar-hint.hidden {
-        display: none !important;
     }
     
     /* Mobile adjustments */
     @media (max-width: 768px) {
         .sidebar-hint {
-            top: 8px;
-            left: 50px;
-            padding: 8px 14px;
-            font-size: 0.8rem;
+            top: 6px;
+            left: 42px;
+            padding: 5px 10px;
+            font-size: 0.7rem;
         }
     }
 </style>
 <div class="sidebar-hint">
-    ← ✏️ Configure Your Scenario
+    ← Your Scenario
 </div>
 """, unsafe_allow_html=True)
 
