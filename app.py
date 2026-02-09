@@ -175,6 +175,28 @@ st.markdown(f"""
         font-size: 0.9rem !important;
     }}
     
+    /* Radio button labels styling for visibility */
+    section[data-testid="stSidebar"] .stRadio label {{
+        color: {COLORS['primary']} !important;
+        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+    }}
+    
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {{
+        background: {COLORS['card']} !important;
+        border: 2px solid {COLORS['primary']} !important;
+        border-radius: 8px !important;
+        padding: 8px 16px !important;
+        margin: 2px !important;
+        color: {COLORS['primary']} !important;
+        font-weight: 700 !important;
+    }}
+    
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label[data-checked="true"] {{
+        background: {COLORS['primary']} !important;
+        color: white !important;
+    }}
+    
     section[data-testid="stSidebar"] .stNumberInput > div > div > input {{
         background: {COLORS['card']} !important;
         border: 2px solid {COLORS['border']} !important;
@@ -359,6 +381,13 @@ st.markdown(f"""
     
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
+    
+    /* Hide Streamlit branding and GitHub link */
+    [data-testid="stToolbar"] {{visibility: hidden;}}
+    .viewerBadge_container__r5tak {{display: none !important;}}
+    .stDeployButton {{display: none !important;}}
+    #stDecoration {{display: none !important;}}
+    
     hr {{ border: none; height: 1px; background: {COLORS['border']}; margin: 1.5rem 0; }}
     
     @media (max-width: 768px) {{
