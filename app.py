@@ -5,6 +5,7 @@ Based on Q1/2026 US Market Research
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import plotly.graph_objects as go
 import numpy as np
 from fpdf import FPDF
@@ -615,6 +616,62 @@ st.markdown("""
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+# Clickable "Configure Your Scenario" button that opens sidebar
+components.html("""
+<div id="config-trigger" onclick="openSidebar()" style="
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #1A3C40 0%, #2D5A5A 100%);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(26, 60, 64, 0.3);
+    transition: all 0.2s ease;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+">
+    <span style="font-size: 1.1rem;">✏️</span>
+    <span>Configure Your Scenario</span>
+    <span style="opacity: 0.7;">→</span>
+</div>
+<script>
+    function openSidebar() {
+        // Access parent document (Streamlit's main document)
+        const parentDoc = window.parent.document;
+        
+        // Try multiple selectors for sidebar toggle
+        const selectors = [
+            '[data-testid="collapsedControl"]',
+            '[data-testid="stSidebarCollapsedControl"]', 
+            'button[kind="header"]',
+            '.css-1rs6os'
+        ];
+        
+        for (const selector of selectors) {
+            const btn = parentDoc.querySelector(selector);
+            if (btn) {
+                btn.click();
+                break;
+            }
+        }
+    }
+    
+    // Add hover effect
+    const trigger = document.getElementById('config-trigger');
+    trigger.onmouseover = function() {
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 4px 12px rgba(26, 60, 64, 0.4)';
+    };
+    trigger.onmouseout = function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 2px 8px rgba(26, 60, 64, 0.3)';
+    };
+</script>
+""", height=50)
 
 # ============================================================================
 # SIDEBAR - CLEAN WITH NESTED EXPANDERS
