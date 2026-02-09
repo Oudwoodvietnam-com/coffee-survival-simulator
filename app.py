@@ -68,15 +68,22 @@ st.set_page_config(
 )
 
 # ============================================================================
-# PASSWORD PROTECTION
+# PASSWORD PROTECTION (Persistent via Query Params)
 # ============================================================================
 def check_password():
     """Returns `True` if the user had the correct password."""
     
+    # Check if already authenticated via query params
+    query_params = st.query_params
+    if query_params.get("auth") == "verified":
+        return True
+    
     def password_entered():
         """Checks whether a password entered by the user is correct."""
-        if st.session_state["password"] == "SAVE150K":
+        if st.session_state["password"] == "save150k":
             st.session_state["password_correct"] = True
+            # Set query param to persist across refreshes
+            st.query_params["auth"] = "verified"
             del st.session_state["password"]  # Don't store password
         else:
             st.session_state["password_correct"] = False
@@ -120,11 +127,12 @@ def check_password():
                 label_visibility="collapsed"
             )
             st.error("❌ Incorrect access code. Please try again.")
-            st.caption("💡 Hint: SAVE + the amount this tool saves you (in thousands)")
+            st.caption("💡 Hint: save + the amount this tool saves you (in thousands)")
         return False
     
     else:
-        # Password correct
+        # Password correct - set query param for persistence
+        st.query_params["auth"] = "verified"
         return True
 
 if not check_password():
@@ -182,9 +190,32 @@ st.markdown(f"""
     
     section[data-testid="stSidebar"] .stExpander {{
         background: {COLORS['card']} !important;
-        border: 1px solid {COLORS['border']} !important;
+        border: 2px solid {COLORS['border']} !important;
         border-radius: 10px !important;
         margin-bottom: 0.5rem !important;
+    }}
+    
+    /* Main expander header (collapsed state) - improved visibility */
+    section[data-testid="stSidebar"] .stExpander > details > summary {{
+        background: linear-gradient(135deg, {COLORS['primary']} 0%, #2D5A5A 100%) !important;
+        border-radius: 8px !important;
+        padding: 0.75rem 1rem !important;
+    }}
+    
+    section[data-testid="stSidebar"] .stExpander > details > summary p {{
+        color: white !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+    }}
+    
+    section[data-testid="stSidebar"] .stExpander > details > summary svg {{
+        color: white !important;
+    }}
+    
+    /* When expanded - lighter background */
+    section[data-testid="stSidebar"] .stExpander > details[open] > summary {{
+        background: {COLORS['primary']} !important;
+        border-radius: 8px 8px 0 0 !important;
     }}
     
     /* Enhanced visibility for nested expanders */
@@ -193,10 +224,18 @@ st.markdown(f"""
         border: 2px solid {COLORS['primary']} !important;
     }}
     
-    section[data-testid="stSidebar"] .stExpander .stExpander summary p {{
+    section[data-testid="stSidebar"] .stExpander .stExpander > details > summary {{
+        background: #E8F4F4 !important;
+    }}
+    
+    section[data-testid="stSidebar"] .stExpander .stExpander > details > summary p {{
         color: {COLORS['primary']} !important;
         font-weight: 700 !important;
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
+    }}
+    
+    section[data-testid="stSidebar"] .stExpander .stExpander > details > summary svg {{
+        color: {COLORS['primary']} !important;
     }}
     
     /* Nested expander styling */
