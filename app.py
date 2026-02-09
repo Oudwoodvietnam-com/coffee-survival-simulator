@@ -617,61 +617,52 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Clickable "Configure Your Scenario" button that opens sidebar
-components.html("""
-<div id="config-trigger" onclick="openSidebar()" style="
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #1A3C40 0%, #2D5A5A 100%);
-    color: white;
-    padding: 0.6rem 1.2rem;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    box-shadow: 0 2px 8px rgba(26, 60, 64, 0.3);
-    transition: all 0.2s ease;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-">
-    <span style="font-size: 1.1rem;">✏️</span>
-    <span>Configure Your Scenario</span>
-    <span style="opacity: 0.7;">→</span>
-</div>
-<script>
-    function openSidebar() {
-        // Access parent document (Streamlit's main document)
-        const parentDoc = window.parent.document;
-        
-        // Try multiple selectors for sidebar toggle
-        const selectors = [
-            '[data-testid="collapsedControl"]',
-            '[data-testid="stSidebarCollapsedControl"]', 
-            'button[kind="header"]',
-            '.css-1rs6os'
-        ];
-        
-        for (const selector of selectors) {
-            const btn = parentDoc.querySelector(selector);
-            if (btn) {
-                btn.click();
-                break;
-            }
+# CSS to highlight sidebar toggle button and add label
+st.markdown("""
+<style>
+    /* Highlight and animate the sidebar toggle button */
+    [data-testid="collapsedControl"] {
+        background: linear-gradient(135deg, #1A3C40 0%, #2D5A5A 100%) !important;
+        border-radius: 8px !important;
+        animation: pulseGlow 2s ease-in-out infinite !important;
+    }
+    
+    [data-testid="collapsedControl"] svg {
+        color: white !important;
+        width: 24px !important;
+        height: 24px !important;
+    }
+    
+    @keyframes pulseGlow {
+        0%, 100% { 
+            box-shadow: 0 0 5px #1A3C40, 0 0 10px #1A3C40; 
+            transform: scale(1);
+        }
+        50% { 
+            box-shadow: 0 0 15px #C38D56, 0 0 25px #C38D56; 
+            transform: scale(1.05);
         }
     }
     
-    // Add hover effect
-    const trigger = document.getElementById('config-trigger');
-    trigger.onmouseover = function() {
-        this.style.transform = 'translateY(-2px)';
-        this.style.boxShadow = '0 4px 12px rgba(26, 60, 64, 0.4)';
-    };
-    trigger.onmouseout = function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 2px 8px rgba(26, 60, 64, 0.3)';
-    };
-</script>
-""", height=50)
+    /* Add label next to toggle button */
+    [data-testid="collapsedControl"]::after {
+        content: "← Configure Your Scenario";
+        position: absolute;
+        left: 50px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #1A3C40 0%, #2D5A5A 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(26, 60, 64, 0.3);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # ============================================================================
 # SIDEBAR - CLEAN WITH NESTED EXPANDERS
