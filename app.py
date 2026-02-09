@@ -659,6 +659,25 @@ st.markdown("""
             font-size: 0.7rem;
         }
     }
+    
+    /* Style the REAL sidebar toggle button for visibility */
+    [data-testid="collapsedControl"],
+    [data-testid="stSidebarCollapseButton"] button,
+    section[data-testid="stSidebar"] button[kind="header"] {
+        background: linear-gradient(135deg, #1A3C40 0%, #2D5A5A 100%) !important;
+        border: 2px solid #C38D56 !important;
+        border-radius: 8px !important;
+        padding: 6px !important;
+        box-shadow: 0 2px 8px rgba(26, 60, 64, 0.4) !important;
+    }
+    
+    [data-testid="collapsedControl"] svg,
+    [data-testid="stSidebarCollapseButton"] svg,
+    section[data-testid="stSidebar"] button[kind="header"] svg {
+        color: white !important;
+        width: 20px !important;
+        height: 20px !important;
+    }
 </style>
 <div class="sidebar-hint">
     ← Your Scenario
