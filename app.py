@@ -617,51 +617,57 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# CSS to highlight sidebar toggle button and add label
+# Floating indicator pointing to sidebar toggle
 st.markdown("""
 <style>
-    /* Highlight and animate the sidebar toggle button */
-    [data-testid="collapsedControl"] {
-        background: linear-gradient(135deg, #1A3C40 0%, #2D5A5A 100%) !important;
-        border-radius: 8px !important;
-        animation: pulseGlow 2s ease-in-out infinite !important;
-    }
-    
-    [data-testid="collapsedControl"] svg {
-        color: white !important;
-        width: 24px !important;
-        height: 24px !important;
-    }
-    
-    @keyframes pulseGlow {
-        0%, 100% { 
-            box-shadow: 0 0 5px #1A3C40, 0 0 10px #1A3C40; 
-            transform: scale(1);
-        }
-        50% { 
-            box-shadow: 0 0 15px #C38D56, 0 0 25px #C38D56; 
-            transform: scale(1.05);
-        }
-    }
-    
-    /* Add label next to toggle button */
-    [data-testid="collapsedControl"]::after {
-        content: "← Configure Your Scenario";
-        position: absolute;
-        left: 50px;
-        top: 50%;
-        transform: translateY(-50%);
+    /* Floating indicator near sidebar toggle */
+    .sidebar-hint {
+        position: fixed;
+        top: 12px;
+        left: 55px;
+        z-index: 999999;
         background: linear-gradient(135deg, #1A3C40 0%, #2D5A5A 100%);
         color: white;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 0.85rem;
+        padding: 10px 18px;
+        border-radius: 25px;
+        font-size: 0.9rem;
         font-weight: 600;
-        white-space: nowrap;
-        box-shadow: 0 2px 8px rgba(26, 60, 64, 0.3);
+        box-shadow: 0 4px 15px rgba(26, 60, 64, 0.4);
+        animation: bounceHint 1.5s ease-in-out infinite;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        white-space: nowrap;
+    }
+    
+    @keyframes bounceHint {
+        0%, 100% { 
+            transform: translateX(0);
+            opacity: 1;
+        }
+        50% { 
+            transform: translateX(8px);
+            opacity: 0.8;
+        }
+    }
+    
+    /* Hide when sidebar is open */
+    [data-testid="stSidebar"][aria-expanded="true"] ~ .main .sidebar-hint,
+    .sidebar-hint.hidden {
+        display: none !important;
+    }
+    
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+        .sidebar-hint {
+            top: 8px;
+            left: 50px;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+        }
     }
 </style>
+<div class="sidebar-hint">
+    ← ✏️ Configure Your Scenario
+</div>
 """, unsafe_allow_html=True)
 
 # ============================================================================
