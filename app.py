@@ -383,10 +383,14 @@ st.markdown(f"""
     footer {{visibility: hidden;}}
     
     /* Hide Streamlit branding and GitHub link */
-    [data-testid="stToolbar"] {{visibility: hidden;}}
     .viewerBadge_container__r5tak {{display: none !important;}}
     .stDeployButton {{display: none !important;}}
     #stDecoration {{display: none !important;}}
+    a[href="https://streamlit.io/cloud"] {{display: none !important;}}
+    [data-testid="manage-app-button"] {{display: none !important;}}
+    ._profileContainer_gzau3_53 {{display: none !important;}}
+    .st-emotion-cache-czk5ss {{display: none !important;}}
+    [data-testid="stStatusWidget"] {{display: none !important;}}
     
     hr {{ border: none; height: 1px; background: {COLORS['border']}; margin: 1.5rem 0; }}
     
